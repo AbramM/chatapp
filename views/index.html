@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <title>chatting-app</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat+material+icons">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> 
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"  rel="stylesheet">
+    
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 14px "Montserrat",sans-serif; color:white;  background: #000000;}
+      input { border: 0; padding: 10px; width: 5%; margin-right: .5%; }
+      #msgBox { list-style-type: none; margin: 0; padding: 0; }
+      #msgBox li { padding: 5px 10px; }
+      #msgBox li:nth-child(odd) { background: #ffffff; }
+      #msgBox { margin-bottom: 80px }
+    </style> 
+    <header class="w3-container w3-padding-32 w3-center w3-black" id="home">
+    <h1 class="w3-xxlarge"><span class="w3-hide-small"><i class="material-icons">thumbs_up_down</i>Yo</span>Bro!</h1>
+    <P>chatting application</p>
+  </header>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <!--<script src="path/to/your/jquery.min.js"></script>
+    <script src="path/to/your/jquery.ui.min.js"></script>-->
+    <script>
+        var name,
+            socket = io.connect("http://localhost:3000");
+        $(function () {
+            //as the user to enter their nick name or name.
+            name = window.prompt("enter your username");
+            //If the name is not given, ask the user to enter once again
+            if (name == null) {
+                $("body").html(" please refresh the page and try again ");
+            }
+            //When send button is clicked on, send the message to server
+            $("#send").click(function () {
+                //send to the server with person name and message
+                socket.emit("clientMsg", {
+                    "name": name,
+                    "msg": $("#msg").val()
+                });
+            });
+
+            //After sending message to the server, we'll have to wire up the event for it.
+            //We can do the following. Upon receiving the message print it to the message box
+            //that we've created in our html
+            socket.on("serverMsg", function (data) {
+                //Append the message from the server to the message box
+                $("#msgBox").append("<strong>" + data.name + 
+                "</strong>: " + data.msg + "<br/>");
+            });
+
+            $("#msg").on("keyup", function (event) {
+                socket.emit("sender", {
+                    name: name
+                });
+            });
+
+            socket.on("sender", function (data) {
+                $("#status").html(data.name + " is typing");
+                setTimeout(function () {
+                    $("#status").html('');
+                }, 3000);
+            });
+        });
+    </script>
+  </head>
+    <body>
+          <!--Message box: To show the sent/received messages-->
+     <div id="msgBox">
+     </div>
+      <!--Textbox: to enter the message text-->
+     <input type="text" id="msg" style="width:300px" />
+     <!--Send: A button to send the message to others-->
+      <input type="submit" id="send" value="send" />
+    <br/>
+    <div id="status"></div>
+    <div>
+  <footer class="w3-content w3-padding-64 w3-text-grey w3-xlarge">
+    <i class="fa fa-facebook-official w3-hover-opacity"></i>
+    <i class="fa fa-instagram w3-hover-opacity"></i>
+    <i class="fa fa-snapchat w3-hover-opacity"></i>
+    <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+    <i class="fa fa-twitter w3-hover-opacity"></i>
+    <i class="fa fa-linkedin w3-hover-opacity"></i>
+    <p class="w3-medium">Powered by <a href="http://etal.co.za/index.php/code" target="_blank" class="w3-hover-text-green">Code.etal</a></p>
+  <!-- End footer -->
+  </footer>
+</div>
+  </body>
+</html>
+
+<!--<div>
+       <ul id="messages"></ul>
+      <form action="">
+       <input id="m" autocomplete="off" /><button>Send</button>
+      </form>
+  </div>
+  <div id="users"></div>  
+  </body>
